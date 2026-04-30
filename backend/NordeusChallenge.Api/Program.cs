@@ -1,44 +1,38 @@
+using NordeusChallenge.Api.Models;
+using NordeusChallenge.Api.Services;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<MonsterMoveService>();
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
-app.UseHttpsRedirection();
+app.UseCors();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapGet("/api/run-config", () =>
+    Results.Ok(GameDataService.GetRunConfig()))
+    .WithName("GetRunConfig");
 
-app.MapGet("/weatherforecast", () =>
+app.MapPost("/api/monster-move", (BattleState state, MonsterMoveService monsterMoveService) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    var monster = GameDataService.GetMonster(state.MonsterId);
+    if (monster is null)
+        return Results.NotFound($"Monster '{state.MonsterId}' not found.");
+
+    var move = monsterMoveService.PickMove(monster, state);
+    return Results.Ok(new MonsterMoveResponse(move));
 })
-.WithName("GetWeatherForecast");
+.WithName("GetMonsterMove");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
