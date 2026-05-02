@@ -45,7 +45,7 @@ public static class GameDataService
     public static RunConfig GetRunConfig() => new(
         Hero: new HeroConfig(
             Name: "Knight",
-            BaseStats:             new Stats(Health: 100, Attack: 15, Defense: 10, Magic: 10),
+            BaseStats:             new Stats(Health: 10, Attack: 15, Defense: 10, Magic: 10),
             StatIncreasePerLevel:  new Stats(Health:  15, Attack:  5, Defense:  5, Magic:  5),
             XpPerWin:    50,
             XpToLevelUp: 100,

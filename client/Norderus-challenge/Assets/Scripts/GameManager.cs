@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     public int  MonstersDefeated   { get; private set; }  // how far the player has progressed
     public int  CurrentMonsterIndex { get; private set; } // which monster is being fought right now
     public Move LastLearnedMove     { get; private set; }
+    public bool LastMoveIsNew       { get; private set; }
 
     // ── Events ───────────────────────────────────────────────────────────────
     public event Action OnRunConfigLoaded;
@@ -156,8 +157,9 @@ public class GameManager : MonoBehaviour
 
         var pool = unlearnedMoves.Count > 0 ? unlearnedMoves : monsterMoves;
         LastLearnedMove = pool[UnityEngine.Random.Range(0, pool.Count)];
+        LastMoveIsNew   = !LearnedMoves.Exists(m => m.id == LastLearnedMove.id);
 
-        if (!LearnedMoves.Exists(m => m.id == LastLearnedMove.id))
+        if (LastMoveIsNew)
             LearnedMoves.Add(LastLearnedMove);
     }
 

@@ -5,12 +5,21 @@ using TMPro;
 public class MainMenuUI : MonoBehaviour
 {
     [SerializeField] private Button startButton;
+    [SerializeField] private Button exitButton;
     [SerializeField] private TextMeshProUGUI statusText;
 
     private void Start()
     {
         statusText.text = string.Empty;
         startButton.onClick.AddListener(OnStartClicked);
+        exitButton.onClick.AddListener(() =>
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        });
         GameManager.Instance.OnRunConfigLoadFailed += OnLoadFailed;
     }
 
