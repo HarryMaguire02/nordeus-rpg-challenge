@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
     // ── Events ───────────────────────────────────────────────────────────────
     public event Action OnRunConfigLoaded;
     public event Action OnHeroStateChanged;
+    public event Action<string> OnRunConfigLoadFailed;
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -47,7 +48,11 @@ public class GameManager : MonoBehaviour
                 OnRunConfigLoaded?.Invoke();
                 SceneManager.LoadScene("Map");
             },
-            error => Debug.LogError($"Failed to fetch run config: {error}")
+            error =>
+            {
+                Debug.LogError($"Failed to fetch run config: {error}");
+                OnRunConfigLoadFailed?.Invoke(error);
+            }
         );
     }
 
