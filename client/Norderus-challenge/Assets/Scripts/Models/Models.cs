@@ -31,6 +31,7 @@ public class Move
     public string id;
     public string name;
     public MoveType type;
+    public string description;
     public MoveEffect primary;
     public MoveEffect secondary; // null if move has no secondary effect
 }

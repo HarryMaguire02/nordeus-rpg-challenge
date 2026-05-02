@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class BattleUI : MonoBehaviour
@@ -31,11 +32,28 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private Button mapButton;
     [SerializeField] private Button mainMenuButton;
 
+    [Header("Sprites")]
+    [SerializeField] private Image heroSprite;
+    [SerializeField] private Image monsterSprite;
+    [SerializeField] private Sprite knightSprite;
+    [SerializeField] private Sprite[] monsterSprites;
+
+    [Header("Battle Log")]
+    [SerializeField] private ScrollRect battleLogScrollRect;
+    [SerializeField] private Transform battleLogContent;
+
+    [Header("Move Tooltip")]
+    [SerializeField] private GameObject moveTooltipPanel;
+    [SerializeField] private TextMeshProUGUI moveTooltipText;
+
     private void Start()
     {
         winPanel.SetActive(false);
         lossPanel.SetActive(false);
         feedbackText.text = string.Empty;
+        if (moveTooltipPanel != null) moveTooltipPanel.SetActive(false);
+        ClearBattleLog();
+        SetupSprites();
 
         BattleManager.Instance.OnStatsUpdated    += OnStatsUpdated;
         BattleManager.Instance.OnMoveExecuted    += OnMoveExecuted;
@@ -84,11 +102,13 @@ public class BattleUI : MonoBehaviour
         StopAllCoroutines();
         feedbackText.color = new Color(feedbackText.color.r, feedbackText.color.g, feedbackText.color.b, 1f);
         feedbackText.text  = message;
+        AddLogEntry(message);
         StartCoroutine(FadeFeedback());
     }
 
     private void OnPlayerTurnStart()
     {
+        if (moveTooltipPanel != null) moveTooltipPanel.SetActive(false);
         var equipped = GameManager.Instance.EquippedMoves;
         for (int i = 0; i < moveButtons.Length; i++)
         {
@@ -100,6 +120,7 @@ public class BattleUI : MonoBehaviour
                 moveButtonTexts[i].text = capturedMove.name;
                 moveButtons[i].onClick.RemoveAllListeners();
                 moveButtons[i].onClick.AddListener(() => BattleManager.Instance.PlayerSelectMove(capturedMove));
+                AddMoveTooltip(moveButtons[i], capturedMove);
             }
             else
             {
@@ -110,17 +131,85 @@ public class BattleUI : MonoBehaviour
 
     private void OnMonsterTurnStart()
     {
+        if (moveTooltipPanel != null) moveTooltipPanel.SetActive(false);
         foreach (var btn in moveButtons)
             btn.interactable = false;
     }
 
     private void OnBattleEnd(bool heroWon)
     {
+        if (moveTooltipPanel != null) moveTooltipPanel.SetActive(false);
         foreach (var btn in moveButtons)
             btn.interactable = false;
 
         if (heroWon) winPanel.SetActive(true);
         else         lossPanel.SetActive(true);
+    }
+
+    // ── Sprites ──────────────────────────────────────────────────────────────
+
+    private void SetupSprites()
+    {
+        if (heroSprite != null && knightSprite != null)
+            heroSprite.sprite = knightSprite;
+
+        if (monsterSprite != null && monsterSprites != null)
+        {
+            int idx = GameManager.Instance.CurrentMonsterIndex;
+            if (idx >= 0 && idx < monsterSprites.Length)
+                monsterSprite.sprite = monsterSprites[idx];
+        }
+    }
+
+    // ── Battle Log ───────────────────────────────────────────────────────────
+
+    private void ClearBattleLog()
+    {
+        if (battleLogContent == null) return;
+        foreach (Transform child in battleLogContent)
+            Destroy(child.gameObject);
+    }
+
+    private void AddLogEntry(string text)
+    {
+        if (battleLogContent == null || battleLogScrollRect == null) return;
+        var go = new GameObject("LogEntry");
+        go.transform.SetParent(battleLogContent, false);
+        var tmp = go.AddComponent<TextMeshProUGUI>();
+        tmp.text = text;
+        tmp.fontSize = 13;
+        tmp.color = Color.white;
+        tmp.enableWordWrapping = true;
+        go.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        Canvas.ForceUpdateCanvases();
+        battleLogScrollRect.verticalNormalizedPosition = 0f;
+    }
+
+    // ── Move Tooltip ─────────────────────────────────────────────────────────
+
+    private void AddMoveTooltip(Button btn, Move move)
+    {
+        if (moveTooltipPanel == null) return;
+        var trigger = btn.gameObject.GetComponent<EventTrigger>()
+                      ?? btn.gameObject.AddComponent<EventTrigger>();
+        trigger.triggers.Clear();
+
+        var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+        enter.callback.AddListener(_ => ShowTooltip(move));
+        trigger.triggers.Add(enter);
+
+        var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+        exit.callback.AddListener(_ => moveTooltipPanel.SetActive(false));
+        trigger.triggers.Add(exit);
+    }
+
+    private void ShowTooltip(Move move)
+    {
+        if (moveTooltipPanel == null) return;
+        moveTooltipPanel.SetActive(true);
+        string typeLabel = move.type == MoveType.Physical ? "Physical" : "Magic";
+        string desc = string.IsNullOrEmpty(move.description) ? "" : move.description;
+        moveTooltipText.text = $"<b>{move.name}</b>  [{typeLabel}]\n{desc}";
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

@@ -24,7 +24,7 @@ public record MoveEffect(EffectKind Kind, int BaseValue, int Duration = 0);
 //   Heal            = attacker.Magic + Primary.BaseValue
 //   SelfDamage      = fixed HP cost = Primary.BaseValue (no stat scaling)
 //   Buff/Debuff     = flat stat change of BaseValue for Duration turns
-public record Move(string Id, string Name, MoveType Type, MoveEffect Primary, MoveEffect? Secondary = null);
+public record Move(string Id, string Name, MoveType Type, string Description, MoveEffect Primary, MoveEffect? Secondary = null);
 
 public record Stats(int Health, int Attack, int Defense, int Magic);
 
