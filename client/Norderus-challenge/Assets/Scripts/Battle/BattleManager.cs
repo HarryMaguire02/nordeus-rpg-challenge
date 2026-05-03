@@ -26,9 +26,9 @@ public class BattleManager : MonoBehaviour
         public List<Move> Moves;
         public readonly List<StatModifier> Modifiers = new();
 
-        public int EffectiveAttack => Mathf.Max(1, BaseStats.attack + ModSum(EffectKind.BuffSelfAttack,   EffectKind.DebuffTargetAttack));
-        public int EffectiveDefense => Mathf.Max(0, BaseStats.defense + ModSum(EffectKind.BuffSelfDefense,  EffectKind.DebuffTargetDefense));
-        public int EffectiveMagic => Mathf.Max(1, BaseStats.magic + ModSum(EffectKind.BuffSelfMagic,    EffectKind.DebuffTargetMagic));
+        public int EffectiveAttack => Mathf.Max(1, BaseStats.attack + ModSum(EffectKind.BuffSelfAttack, EffectKind.DebuffTargetAttack));
+        public int EffectiveDefense => Mathf.Max(0, BaseStats.defense + ModSum(EffectKind.BuffSelfDefense, EffectKind.DebuffTargetDefense));
+        public int EffectiveMagic => Mathf.Max(1, BaseStats.magic + ModSum(EffectKind.BuffSelfMagic, EffectKind.DebuffTargetMagic));
 
         private int ModSum(EffectKind buff, EffectKind debuff) =>
             Modifiers.Where(m => m.Kind == buff).Sum(m => m.Value) -
@@ -187,7 +187,7 @@ public class BattleManager : MonoBehaviour
 
     private bool CheckBattleEnd()
     {
-        if (Monster.CurrentHp <= 0) { _battleOver = true; OnBattleEnd?.Invoke(true);  return true; }
+        if (Monster.CurrentHp <= 0) { _battleOver = true; OnBattleEnd?.Invoke(true); return true; }
         if (Hero.CurrentHp <= 0) { _battleOver = true; OnBattleEnd?.Invoke(false); return true; }
         return false;
     }

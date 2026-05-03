@@ -63,8 +63,8 @@ public class MapUI : MonoBehaviour
     private static readonly string[] HeroOrder = { "knight", "rogue", "mage" };
 
     private static readonly Color ColorDefeated = new Color(0.20f, 0.70f, 0.20f, 1f);
-    private static readonly Color ColorCurrent  = new Color(0.55f, 0.10f, 0.10f, 1f);
-    private static readonly Color ColorFuture   = new Color(0.35f, 0.35f, 0.35f, 1f);
+    private static readonly Color ColorCurrent = new Color(0.55f, 0.10f, 0.10f, 1f);
+    private static readonly Color ColorFuture = new Color(0.35f, 0.35f, 0.35f, 1f);
 
     private void RefreshEncounters()
     {
@@ -111,7 +111,7 @@ public class MapUI : MonoBehaviour
     {
         if (heroNameText != null)
         {
-            heroNameText.text  = GameManager.Instance.RunConfig.hero.name;
+            heroNameText.text = GameManager.Instance.RunConfig.hero.name;
             heroNameText.color = new Color(1f, 0.84f, 0f);
         }
         if (heroPortraitImage != null && heroSprites != null)
@@ -126,12 +126,12 @@ public class MapUI : MonoBehaviour
 
     private void RefreshHeroStats()
     {
-        var gm       = GameManager.Instance;
-        var s        = gm.HeroCurrentStats;
+        var gm = GameManager.Instance;
+        var s = gm.HeroCurrentStats;
         int xpNeeded = gm.RunConfig.hero.xpToLevelUp;
 
         heroLevelText.text = $"Level {gm.HeroLevel}";
-        heroXpText.text    = $"XP: {gm.HeroXp} / {xpNeeded}";
+        heroXpText.text = $"XP: {gm.HeroXp} / {xpNeeded}";
         heroStatsText.text = $"HP: {s.health}   ATK: {s.attack}   DEF: {s.defense}   MAG: {s.magic}";
     }
 
@@ -190,31 +190,31 @@ public class MapUI : MonoBehaviour
         var go = new GameObject(move.name);
         go.transform.SetParent(parent, worldPositionStays: false);
 
-        var layout       = go.AddComponent<LayoutElement>();
+        var layout = go.AddComponent<LayoutElement>();
         layout.minHeight = 45f;
 
-        var img   = go.AddComponent<Image>();
+        var img = go.AddComponent<Image>();
         img.color = equipped ? new Color(0.20f, 0.80f, 0.20f, 1f)
                              : new Color(0.70f, 0.70f, 0.70f, 1f);
 
-        var btn           = go.AddComponent<Button>();
+        var btn = go.AddComponent<Button>();
         btn.targetGraphic = img;
-        btn.interactable  = clickable;
+        btn.interactable = clickable;
 
         var labelGo = new GameObject("Label");
         labelGo.transform.SetParent(go.transform, worldPositionStays: false);
 
-        var rt       = labelGo.AddComponent<RectTransform>();
+        var rt = labelGo.AddComponent<RectTransform>();
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
 
-        var tmp       = labelGo.AddComponent<TextMeshProUGUI>();
-        tmp.text      = $"{move.name}  ({move.type})";
+        var tmp = labelGo.AddComponent<TextMeshProUGUI>();
+        tmp.text = $"{move.name}  ({move.type})";
         tmp.alignment = TextAlignmentOptions.Center;
-        tmp.fontSize  = 16f;
-        tmp.color     = Color.black;
+        tmp.fontSize = 16f;
+        tmp.color = Color.black;
 
         return btn;
     }

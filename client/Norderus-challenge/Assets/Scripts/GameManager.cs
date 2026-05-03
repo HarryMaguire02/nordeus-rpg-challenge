@@ -71,17 +71,17 @@ public class GameManager : MonoBehaviour
 
     private void InitHeroState()
     {
-        HeroLevel        = 1;
-        HeroXp           = 0;
+        HeroLevel = 1;
+        HeroXp = 0;
         MonstersDefeated = 0;
-        LastLearnedMove  = null;
-        PendingLevelUp   = false;
+        LastLearnedMove = null;
+        PendingLevelUp = false;
         _chosenLevelUpBoosts = new List<Stats>();
 
         RecalculateStats();
 
         EquippedMoves = new List<Move>(RunConfig.hero.defaultMoves);
-        LearnedMoves  = new List<Move>(RunConfig.hero.defaultMoves);
+        LearnedMoves = new List<Move>(RunConfig.hero.defaultMoves);
     }
 
     // ── Battle flow ──────────────────────────────────────────────────────────
@@ -182,7 +182,7 @@ public class GameManager : MonoBehaviour
 
         var pool = unlearnedMoves.Count > 0 ? unlearnedMoves : monsterMoves;
         LastLearnedMove = pool[UnityEngine.Random.Range(0, pool.Count)];
-        LastMoveIsNew   = !LearnedMoves.Exists(m => m.id == LastLearnedMove.id);
+        LastMoveIsNew = !LearnedMoves.Exists(m => m.id == LastLearnedMove.id);
 
         if (LastMoveIsNew)
             LearnedMoves.Add(LastLearnedMove);

@@ -69,11 +69,11 @@ public class BattleUI : MonoBehaviour
         ClearBattleLog();
         SetupSprites();
 
-        BattleManager.Instance.OnStatsUpdated    += OnStatsUpdated;
-        BattleManager.Instance.OnMoveExecuted    += OnMoveExecuted;
+        BattleManager.Instance.OnStatsUpdated += OnStatsUpdated;
+        BattleManager.Instance.OnMoveExecuted += OnMoveExecuted;
         BattleManager.Instance.OnPlayerTurnStart += OnPlayerTurnStart;
         BattleManager.Instance.OnMonsterTurnStart += OnMonsterTurnStart;
-        BattleManager.Instance.OnBattleEnd       += OnBattleEnd;
+        BattleManager.Instance.OnBattleEnd += OnBattleEnd;
 
         continueButton.onClick.AddListener(() => GameManager.Instance.OnBattleWon());
         retryButton.onClick.AddListener(() => GameManager.Instance.RetryBattle());
@@ -86,28 +86,28 @@ public class BattleUI : MonoBehaviour
     private void OnDestroy()
     {
         if (BattleManager.Instance == null) return;
-        BattleManager.Instance.OnStatsUpdated     -= OnStatsUpdated;
-        BattleManager.Instance.OnMoveExecuted     -= OnMoveExecuted;
-        BattleManager.Instance.OnPlayerTurnStart  -= OnPlayerTurnStart;
+        BattleManager.Instance.OnStatsUpdated -= OnStatsUpdated;
+        BattleManager.Instance.OnMoveExecuted -= OnMoveExecuted;
+        BattleManager.Instance.OnPlayerTurnStart -= OnPlayerTurnStart;
         BattleManager.Instance.OnMonsterTurnStart -= OnMonsterTurnStart;
-        BattleManager.Instance.OnBattleEnd        -= OnBattleEnd;
+        BattleManager.Instance.OnBattleEnd -= OnBattleEnd;
     }
 
     // ── Event handlers ───────────────────────────────────────────────────────
 
     private void OnStatsUpdated()
     {
-        var hero    = BattleManager.Instance.Hero;
+        var hero = BattleManager.Instance.Hero;
         var monster = BattleManager.Instance.Monster;
 
         heroHpBar.maxValue = hero.MaxHp;
-        heroHpBar.value    = hero.CurrentHp;
-        heroHpText.text    = $"{hero.CurrentHp} / {hero.MaxHp}";
+        heroHpBar.value = hero.CurrentHp;
+        heroHpText.text = $"{hero.CurrentHp} / {hero.MaxHp}";
 
         monsterHpBar.maxValue = monster.MaxHp;
-        monsterHpBar.value    = monster.CurrentHp;
-        monsterHpText.text    = $"{monster.CurrentHp} / {monster.MaxHp}";
-        monsterNameText.text  = monster.Name;
+        monsterHpBar.value = monster.CurrentHp;
+        monsterHpText.text = $"{monster.CurrentHp} / {monster.MaxHp}";
+        monsterNameText.text = monster.Name;
 
         RefreshAllModifiers();
     }
@@ -116,7 +116,7 @@ public class BattleUI : MonoBehaviour
     {
         StopAllCoroutines();
         feedbackText.color = new Color(feedbackText.color.r, feedbackText.color.g, feedbackText.color.b, 1f);
-        feedbackText.text  = message;
+        feedbackText.text = message;
         AddLogEntry(message);
         StartCoroutine(FadeFeedback());
     }
@@ -159,7 +159,7 @@ public class BattleUI : MonoBehaviour
             btn.interactable = false;
 
         if (heroWon) winPanel.SetActive(true);
-        else         lossPanel.SetActive(true);
+        else lossPanel.SetActive(true);
     }
 
     // ── Sprites ──────────────────────────────────────────────────────────────
@@ -212,8 +212,7 @@ public class BattleUI : MonoBehaviour
     private void AddMoveTooltip(Button btn, Move move)
     {
         if (moveTooltipPanel == null) return;
-        var trigger = btn.gameObject.GetComponent<EventTrigger>()
-                      ?? btn.gameObject.AddComponent<EventTrigger>();
+        var trigger = btn.gameObject.GetComponent<EventTrigger>() ?? btn.gameObject.AddComponent<EventTrigger>();
         trigger.triggers.Clear();
 
         var btnRect = btn.GetComponent<RectTransform>();
@@ -251,9 +250,9 @@ public class BattleUI : MonoBehaviour
     {
         string stat = mod.Kind switch
         {
-            EffectKind.BuffSelfAttack    or EffectKind.DebuffTargetAttack  => "ATK",
-            EffectKind.BuffSelfDefense   or EffectKind.DebuffTargetDefense => "DEF",
-            EffectKind.BuffSelfMagic     or EffectKind.DebuffTargetMagic   => "MAG",
+            EffectKind.BuffSelfAttack or EffectKind.DebuffTargetAttack  => "ATK",
+            EffectKind.BuffSelfDefense or EffectKind.DebuffTargetDefense => "DEF",
+            EffectKind.BuffSelfMagic or EffectKind.DebuffTargetMagic   => "MAG",
             _ => null
         };
         if (stat == null) return null;
@@ -285,31 +284,31 @@ public class BattleUI : MonoBehaviour
             var chip = new GameObject("Chip");
             chip.transform.SetParent(panel.transform, false);
 
-            var img   = chip.AddComponent<Image>();
+            var img = chip.AddComponent<Image>();
             img.color = ModifierColor(mod);
 
             var csf = chip.AddComponent<ContentSizeFitter>();
             csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-            csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             var hLayout = chip.AddComponent<HorizontalLayoutGroup>();
-            hLayout.padding                = new RectOffset(5, 5, 2, 2);
-            hLayout.childForceExpandWidth  = false;
+            hLayout.padding = new RectOffset(5, 5, 2, 2);
+            hLayout.childForceExpandWidth = false;
             hLayout.childForceExpandHeight = false;
 
             var textGo = new GameObject("Label");
             textGo.transform.SetParent(chip.transform, false);
-            var tmp       = textGo.AddComponent<TextMeshProUGUI>();
-            tmp.text      = label;
-            tmp.fontSize  = 11;
+            var tmp = textGo.AddComponent<TextMeshProUGUI>();
+            tmp.text = label;
+            tmp.fontSize = 11;
             tmp.fontStyle = FontStyles.Bold;
-            tmp.color     = Color.white;
+            tmp.color = Color.white;
         }
     }
 
     private void RefreshAllModifiers()
     {
-        RefreshModifiersPanel(heroModifiersPanel,    BattleManager.Instance.Hero.Modifiers);
+        RefreshModifiersPanel(heroModifiersPanel, BattleManager.Instance.Hero.Modifiers);
         RefreshModifiersPanel(monsterModifiersPanel, BattleManager.Instance.Monster.Modifiers);
     }
 
@@ -320,13 +319,16 @@ public class BattleUI : MonoBehaviour
         if (moveEffectSprites == null || moveEffectSprites.Length < 5) return null;
         switch (move.primary.kind)
         {
-            case EffectKind.Heal:                  return moveEffectSprites[2];
+            case EffectKind.Heal: 
+                return moveEffectSprites[2];
             case EffectKind.BuffSelfAttack:
             case EffectKind.BuffSelfDefense:
-            case EffectKind.BuffSelfMagic:         return moveEffectSprites[3];
+            case EffectKind.BuffSelfMagic: 
+                return moveEffectSprites[3];
             case EffectKind.DebuffTargetAttack:
             case EffectKind.DebuffTargetDefense:
-            case EffectKind.DebuffTargetMagic:     return moveEffectSprites[4];
+            case EffectKind.DebuffTargetMagic: 
+                return moveEffectSprites[4];
             case EffectKind.Damage:
                 return move.type == MoveType.Magic ? moveEffectSprites[1] : moveEffectSprites[0];
             default: return null;
@@ -339,7 +341,7 @@ public class BattleUI : MonoBehaviour
         var icon = moveButtonIcons[index];
         if (icon == null) return;
         var sp = GetMoveSprite(move);
-        icon.sprite  = sp;
+        icon.sprite = sp;
         icon.enabled = sp != null;
     }
 

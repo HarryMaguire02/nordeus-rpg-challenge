@@ -70,7 +70,7 @@ public class ApiService : MonoBehaviour
     {
         var json = JsonUtility.ToJson(battleState);
         using var request = new UnityWebRequest($"{BaseUrl}/api/monster-move", "POST");
-        request.uploadHandler   = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 

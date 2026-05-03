@@ -14,7 +14,7 @@ public class GameDataService : IGameDataService
     public GameDataService(IGameDataRepository repository, IMapper mapper, IMonsterMoveEngine moveEngine)
     {
         _repository = repository;
-        _mapper     = mapper;
+        _mapper = mapper;
         _moveEngine = moveEngine;
     }
 

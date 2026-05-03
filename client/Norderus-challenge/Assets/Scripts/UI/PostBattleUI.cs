@@ -62,7 +62,7 @@ public class PostBattleUI : MonoBehaviour
         if (move == null) return;
         moveNameText.text = move.name;
         moveTypeText.text = move.type.ToString();
-        statusText.text   = gm.LastMoveIsNew
+        statusText.text = gm.LastMoveIsNew
             ? "New move added to your pool!"
             : "Unlucky! You already knew this move.";
     }
