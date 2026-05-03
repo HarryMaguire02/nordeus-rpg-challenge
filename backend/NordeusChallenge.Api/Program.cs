@@ -10,7 +10,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>());
 
-builder.Services.AddScoped<IGameDataRepository, GameDataRepository>();
+builder.Services.AddSingleton<IGameDataRepository, GameDataRepository>();
+builder.Services.AddSingleton<IMonsterMoveEngine, MonsterSmartMoveEngine>();
 builder.Services.AddScoped<IGameDataService, GameDataService>();
 
 builder.Services.AddCors(options =>

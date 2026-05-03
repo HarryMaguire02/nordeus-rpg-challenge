@@ -8,14 +8,17 @@ namespace NordeusChallenge.Api.Repositories;
 // and update the DI binding in Program.cs — no other code changes required.
 public class GameDataRepository : IGameDataRepository
 {
-    private readonly string _dataFilePath;
+    private readonly Lazy<GameDataModel> _data;
 
     public GameDataRepository(IWebHostEnvironment env)
     {
-        _dataFilePath = Path.Combine(env.ContentRootPath, "Data", "game-data.json");
+        var path = Path.Combine(env.ContentRootPath, "Data", "game-data.json");
+        _data = new Lazy<GameDataModel>(() => Load(path));
     }
 
-    public GameDataModel GetGameData()
+    public GameDataModel GetGameData() => _data.Value;
+
+    private static GameDataModel Load(string path)
     {
         var options = new JsonSerializerOptions
         {
@@ -23,7 +26,7 @@ public class GameDataRepository : IGameDataRepository
             Converters = { new JsonStringEnumConverter() }
         };
 
-        return JsonSerializer.Deserialize<GameDataModel>(File.ReadAllText(_dataFilePath), options)
+        return JsonSerializer.Deserialize<GameDataModel>(File.ReadAllText(path), options)
             ?? throw new InvalidOperationException("Failed to load game-data.json.");
     }
 }

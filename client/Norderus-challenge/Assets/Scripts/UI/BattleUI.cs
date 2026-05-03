@@ -30,12 +30,11 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject lossPanel;
     [SerializeField] private Button retryButton;
     [SerializeField] private Button mapButton;
-    [SerializeField] private Button mainMenuButton;
 
     [Header("Sprites")]
     [SerializeField] private Image heroSprite;
     [SerializeField] private Image monsterSprite;
-    [SerializeField] private Sprite knightSprite;
+    [SerializeField] private Sprite[] heroSprites;
     [SerializeField] private Sprite[] monsterSprites;
 
     [Header("Battle Log")]
@@ -46,8 +45,11 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private GameObject moveTooltipPanel;
     [SerializeField] private TextMeshProUGUI moveTooltipText;
 
+    private Canvas _canvas;
+
     private void Start()
     {
+        _canvas = GetComponentInParent<Canvas>();
         winPanel.SetActive(false);
         lossPanel.SetActive(false);
         feedbackText.text = string.Empty;
@@ -62,9 +64,8 @@ public class BattleUI : MonoBehaviour
         BattleManager.Instance.OnBattleEnd       += OnBattleEnd;
 
         continueButton.onClick.AddListener(() => GameManager.Instance.OnBattleWon());
-        retryButton.onClick.AddListener(()    => GameManager.Instance.RetryBattle());
-        mapButton.onClick.AddListener(()      => GameManager.Instance.ReturnToMap());
-        mainMenuButton.onClick.AddListener(() => GameManager.Instance.ReturnToMainMenu());
+        retryButton.onClick.AddListener(() => GameManager.Instance.RetryBattle());
+        mapButton.onClick.AddListener(() => GameManager.Instance.ReturnToMap());
 
         // Must be last — StartBattle fires OnStatsUpdated + OnPlayerTurnStart immediately
         GameManager.Instance.StartCurrentBattle();
@@ -148,10 +149,16 @@ public class BattleUI : MonoBehaviour
 
     // ── Sprites ──────────────────────────────────────────────────────────────
 
+    private static readonly string[] HeroOrder = { "knight", "rogue", "mage" };
+
     private void SetupSprites()
     {
-        if (heroSprite != null && knightSprite != null)
-            heroSprite.sprite = knightSprite;
+        if (heroSprite != null && heroSprites != null)
+        {
+            int heroIdx = System.Array.IndexOf(HeroOrder, GameManager.Instance.SelectedHeroId);
+            if (heroIdx >= 0 && heroIdx < heroSprites.Length)
+                heroSprite.sprite = heroSprites[heroIdx];
+        }
 
         if (monsterSprite != null && monsterSprites != null)
         {
@@ -194,8 +201,9 @@ public class BattleUI : MonoBehaviour
                       ?? btn.gameObject.AddComponent<EventTrigger>();
         trigger.triggers.Clear();
 
+        var btnRect = btn.GetComponent<RectTransform>();
         var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-        enter.callback.AddListener(_ => ShowTooltip(move));
+        enter.callback.AddListener(_ => ShowTooltip(move, btnRect));
         trigger.triggers.Add(enter);
 
         var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
@@ -203,10 +211,18 @@ public class BattleUI : MonoBehaviour
         trigger.triggers.Add(exit);
     }
 
-    private void ShowTooltip(Move move)
+    private void ShowTooltip(Move move, RectTransform buttonRect)
     {
         if (moveTooltipPanel == null) return;
         moveTooltipPanel.SetActive(true);
+
+        var tooltipRect = moveTooltipPanel.GetComponent<RectTransform>();
+        var cam = _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _canvas.worldCamera;
+        var canvasRect = _canvas.GetComponent<RectTransform>();
+        Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, buttonRect.position);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, cam, out Vector2 localPos);
+        tooltipRect.anchoredPosition = localPos + new Vector2(0f, tooltipRect.rect.height * 0.5f + 12f);
+
         string typeLabel = move.type == MoveType.Physical ? "Physical" : "Magic";
         string desc = string.IsNullOrEmpty(move.description) ? "" : move.description;
         moveTooltipText.text = $"<b>{move.name}</b>  [{typeLabel}]\n{desc}";

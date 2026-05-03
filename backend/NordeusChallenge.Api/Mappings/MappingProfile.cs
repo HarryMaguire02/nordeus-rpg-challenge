@@ -11,5 +11,6 @@ public class MappingProfile : Profile
         CreateMap<Stats, StatsDto>();
         CreateMap<MoveEffect, MoveEffectDto>();
         CreateMap<Move, MoveDto>();
+        CreateMap<LevelUpOption, LevelUpOptionDto>();
     }
 }

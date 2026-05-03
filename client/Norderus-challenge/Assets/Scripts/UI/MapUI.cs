@@ -23,11 +23,16 @@ public class MapUI : MonoBehaviour
     [SerializeField] private Transform availableMovesContainer;  // right side of panel
     [SerializeField] private Button closePanelButton;
 
+    [Header("Navigation")]
+    [SerializeField] private Button saveAndExitButton;
+
     private void Start()
     {
         moveManagementPanel.SetActive(false);
         manageMovesButton.onClick.AddListener(() => moveManagementPanel.SetActive(true));
         closePanelButton.onClick.AddListener(() => moveManagementPanel.SetActive(false));
+        if (saveAndExitButton != null)
+            saveAndExitButton.onClick.AddListener(() => GameManager.Instance.SaveAndExit());
 
         GameManager.Instance.OnHeroStateChanged += RefreshAll;
         RefreshAll();
@@ -51,11 +56,11 @@ public class MapUI : MonoBehaviour
 
     private static readonly Color ColorDefeated = new Color(0.20f, 0.70f, 0.20f, 1f);
     private static readonly Color ColorCurrent  = new Color(0.55f, 0.10f, 0.10f, 1f);
-    private static readonly Color ColorFuture   = new Color(0.55f, 0.10f, 0.10f, 1f);
+    private static readonly Color ColorFuture   = new Color(0.35f, 0.35f, 0.35f, 1f);
 
     private void RefreshEncounters()
     {
-        var gm       = GameManager.Instance;
+        var gm = GameManager.Instance;
         var monsters = gm.RunConfig.monsters;
         int defeated = gm.MonstersDefeated;
 
@@ -70,28 +75,18 @@ public class MapUI : MonoBehaviour
             encounterButtons[i].gameObject.SetActive(true);
 
             int captured = i;
+            bool accessible = i <= defeated;
             encounterButtons[i].onClick.RemoveAllListeners();
+            encounterButtons[i].interactable = accessible;
+            encounterButtonTexts[i].text = accessible ? monsters[i].name : "???";
 
-            if (i < defeated)
+            if (accessible)
             {
-                encounterButtonTexts[i].text     = monsters[i].name;
-                encounterButtons[i].interactable = true;
                 encounterButtons[i].onClick.AddListener(() => GameManager.Instance.SelectEncounter(captured));
-                SetButtonColor(encounterButtons[i], ColorDefeated);
             }
-            else if (i == defeated)
-            {
-                encounterButtonTexts[i].text     = monsters[i].name;
-                encounterButtons[i].interactable = true;
-                encounterButtons[i].onClick.AddListener(() => GameManager.Instance.SelectEncounter(captured));
-                SetButtonColor(encounterButtons[i], ColorCurrent);
-            }
-            else
-            {
-                encounterButtonTexts[i].text     = "???";
-                encounterButtons[i].interactable = false;
-                SetButtonColor(encounterButtons[i], ColorFuture);
-            }
+
+            Color color = i < defeated ? ColorDefeated : (i == defeated ? ColorCurrent : ColorFuture);
+            SetButtonColor(encounterButtons[i], color);
         }
     }
 

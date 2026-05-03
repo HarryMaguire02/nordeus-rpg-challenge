@@ -15,10 +15,20 @@ public class GameController : ControllerBase
         _gameDataService = gameDataService;
     }
 
-    [HttpGet("run-config")]
-    public IActionResult GetRunConfig()
+    [HttpGet("heroes")]
+    public IActionResult GetHeroes()
     {
-        return Ok(_gameDataService.GetRunConfig());
+        return Ok(_gameDataService.GetHeroes());
+    }
+
+    [HttpGet("run-config/{heroId}")]
+    public IActionResult GetRunConfig(string heroId)
+    {
+        var config = _gameDataService.GetRunConfig(heroId);
+        if (config is null)
+            return NotFound($"Hero '{heroId}' not found.");
+
+        return Ok(config);
     }
 
     [HttpPost("monster-move")]

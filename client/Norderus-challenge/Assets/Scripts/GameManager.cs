@@ -18,15 +18,22 @@ public class GameManager : MonoBehaviour
     public List<Move> LearnedMoves     { get; private set; }
 
     // ── Run state ────────────────────────────────────────────────────────────
-    public int  MonstersDefeated   { get; private set; }  // how far the player has progressed
-    public int  CurrentMonsterIndex { get; private set; } // which monster is being fought right now
+    public int  MonstersDefeated   { get; private set; }
+    public int  CurrentMonsterIndex { get; private set; }
     public Move LastLearnedMove     { get; private set; }
     public bool LastMoveIsNew       { get; private set; }
+    public bool PendingLevelUp      { get; private set; }
 
     // ── Events ───────────────────────────────────────────────────────────────
     public event Action OnRunConfigLoaded;
     public event Action OnHeroStateChanged;
     public event Action<string> OnRunConfigLoadFailed;
+
+    // ── Level-up tracking ────────────────────────────────────────────────────
+    private List<Stats> _chosenLevelUpBoosts = new();
+
+    // ── Save / load ──────────────────────────────────────────────────────────
+    private const string SaveKey = "NordeusRpgSave";
 
     // ── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -39,9 +46,14 @@ public class GameManager : MonoBehaviour
 
     // ── Run start ────────────────────────────────────────────────────────────
 
-    public void StartRun()
+    public string SelectedHeroId { get; private set; }
+
+    public void StartRun(string heroId)
     {
+        DeleteSave();
+        SelectedHeroId = heroId;
         ApiService.Instance.GetRunConfig(
+            heroId,
             config =>
             {
                 RunConfig = config;
@@ -63,6 +75,8 @@ public class GameManager : MonoBehaviour
         HeroXp           = 0;
         MonstersDefeated = 0;
         LastLearnedMove  = null;
+        PendingLevelUp   = false;
+        _chosenLevelUpBoosts = new List<Stats>();
 
         RecalculateStats();
 
@@ -88,7 +102,8 @@ public class GameManager : MonoBehaviour
     {
         AwardXp();
         LearnMove();
-        OnHeroStateChanged?.Invoke();
+        if (!PendingLevelUp)
+            OnHeroStateChanged?.Invoke();
 
         if (CurrentMonsterIndex >= MonstersDefeated)
             MonstersDefeated++;
@@ -115,11 +130,22 @@ public class GameManager : MonoBehaviour
     {
         if (MonstersDefeated >= RunConfig.monsters.Count)
         {
+            DeleteSave();
             SceneManager.LoadScene("MainMenu");
             return;
         }
 
         SceneManager.LoadScene("Map");
+    }
+
+    // ── Level-up choice ──────────────────────────────────────────────────────
+
+    public void ApplyLevelUpChoice(int optionIndex)
+    {
+        _chosenLevelUpBoosts.Add(RunConfig.hero.levelUpOptions[optionIndex].stats);
+        PendingLevelUp = false;
+        RecalculateStats();
+        OnHeroStateChanged?.Invoke();
     }
 
     // ── Move management ──────────────────────────────────────────────────────
@@ -132,7 +158,7 @@ public class GameManager : MonoBehaviour
 
     public void UnequipMove(Move move)
     {
-        if (EquippedMoves.Count <= 1) return; // must keep at least one move
+        if (EquippedMoves.Count <= 1) return;
         EquippedMoves.RemoveAll(m => m.id == move.id);
     }
 
@@ -141,12 +167,11 @@ public class GameManager : MonoBehaviour
     private void AwardXp()
     {
         HeroXp += RunConfig.hero.xpPerWin;
-
-        while (HeroXp >= RunConfig.hero.xpToLevelUp)
+        if (HeroXp >= RunConfig.hero.xpToLevelUp)
         {
             HeroXp -= RunConfig.hero.xpToLevelUp;
             HeroLevel++;
-            RecalculateStats();
+            PendingLevelUp = true;
         }
     }
 
@@ -165,16 +190,134 @@ public class GameManager : MonoBehaviour
 
     private void RecalculateStats()
     {
-        var b   = RunConfig.hero.baseStats;
-        var inc = RunConfig.hero.statIncreasePerLevel;
-        int lvl = HeroLevel - 1;
+        var b = RunConfig.hero.baseStats;
+        int hp = b.health, atk = b.attack, def = b.defense, mag = b.magic;
+
+        foreach (var boost in _chosenLevelUpBoosts)
+        {
+            hp += boost.health;
+            atk += boost.attack;
+            def += boost.defense;
+            mag += boost.magic;
+        }
 
         HeroCurrentStats = new Stats
         {
-            health  = b.health  + lvl * inc.health,
-            attack  = b.attack  + lvl * inc.attack,
-            defense = b.defense + lvl * inc.defense,
-            magic   = b.magic   + lvl * inc.magic
+            health = hp,
+            attack = atk,
+            defense = def,
+            magic = mag
         };
+    }
+
+    // ── Save / load ──────────────────────────────────────────────────────────
+
+    public static bool HasSave()
+    {
+        return PlayerPrefs.HasKey(SaveKey);
+    }
+
+    public void SaveRun()
+    {
+        var equippedIds = new List<string>();
+        foreach (var move in EquippedMoves)
+            equippedIds.Add(move.id);
+
+        var learnedIds = new List<string>();
+        foreach (var move in LearnedMoves)
+            learnedIds.Add(move.id);
+
+        var save = new SaveData
+        {
+            heroId = SelectedHeroId,
+            heroLevel = HeroLevel,
+            heroXp = HeroXp,
+            monstersDefeated = MonstersDefeated,
+            chosenLevelUpBoosts = new List<Stats>(_chosenLevelUpBoosts),
+            equippedMoveIds = equippedIds,
+            learnedMoveIds = learnedIds
+        };
+
+        PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(save));
+        PlayerPrefs.Save();
+    }
+
+    public void SaveAndExit()
+    {
+        SaveRun();
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void ResumeRun()
+    {
+        if (!PlayerPrefs.HasKey(SaveKey))
+        {
+            OnRunConfigLoadFailed?.Invoke("No save data found.");
+            return;
+        }
+
+        var save = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(SaveKey));
+        ApiService.Instance.GetRunConfig(
+            save.heroId,
+            config =>
+            {
+                RunConfig = config;
+                RestoreFromSave(save);
+                OnRunConfigLoaded?.Invoke();
+                SceneManager.LoadScene("Map");
+            },
+            error =>
+            {
+                Debug.LogError($"Failed to fetch run config on resume: {error}");
+                OnRunConfigLoadFailed?.Invoke(error);
+            }
+        );
+    }
+
+    private void RestoreFromSave(SaveData save)
+    {
+        SelectedHeroId = save.heroId;
+        HeroLevel = save.heroLevel;
+        HeroXp = save.heroXp;
+        MonstersDefeated = save.monstersDefeated;
+        PendingLevelUp = false;
+        LastLearnedMove = null;
+        _chosenLevelUpBoosts = new List<Stats>(save.chosenLevelUpBoosts);
+        RecalculateStats();
+
+        var learnedMoves = new List<Move>();
+        foreach (var id in save.learnedMoveIds)
+        {
+            var move = FindMoveById(id);
+            if (move != null) learnedMoves.Add(move);
+        }
+        LearnedMoves = learnedMoves;
+
+        var equippedMoves = new List<Move>();
+        foreach (var id in save.equippedMoveIds)
+        {
+            var move = FindMoveById(id);
+            if (move != null) equippedMoves.Add(move);
+        }
+        EquippedMoves = equippedMoves.Count > 0 ? equippedMoves : new List<Move>(RunConfig.hero.defaultMoves);
+    }
+
+    private Move FindMoveById(string id)
+    {
+        var heroMove = RunConfig.hero.defaultMoves.Find(m => m.id == id);
+        if (heroMove != null) return heroMove;
+
+        foreach (var monster in RunConfig.monsters)
+        {
+            var monsterMove = monster.moves.Find(m => m.id == id);
+            if (monsterMove != null) return monsterMove;
+        }
+        return null;
+    }
+
+    private static void DeleteSave()
+    {
+        PlayerPrefs.DeleteKey(SaveKey);
+        PlayerPrefs.Save();
     }
 }

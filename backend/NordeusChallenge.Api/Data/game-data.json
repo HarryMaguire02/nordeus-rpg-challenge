@@ -1,12 +1,48 @@
 {
-  "hero": {
-    "name": "Knight",
-    "baseStats": { "health": 100, "attack": 15, "defense": 10, "magic": 10 },
-    "statIncreasePerLevel": { "health": 15, "attack": 5, "defense": 5, "magic": 5 },
-    "xpPerWin": 50,
-    "xpToLevelUp": 100,
-    "defaultMoveIds": [ "slash", "shield_up", "battle_cry", "second_wind" ]
-  },
+  "heroes": [
+    {
+      "id": "knight",
+      "name": "Knight",
+      "description": "A stalwart warrior clad in heavy armor. Balanced stats make him adaptable on the battlefield.",
+      "baseStats": { "health": 100, "attack": 15, "defense": 10, "magic": 10 },
+      "levelUpOptions": [
+        { "label": "Warrior", "stats": { "health": 10, "attack": 14, "defense": 6, "magic": 0 } },
+        { "label": "Tank",    "stats": { "health": 18, "attack":  2, "defense": 10, "magic": 0 } },
+        { "label": "Mage",    "stats": { "health":  8, "attack":  0, "defense":  4, "magic": 18 } }
+      ],
+      "xpPerWin": 50,
+      "xpToLevelUp": 100,
+      "defaultMoveIds": [ "slash", "shield_up", "battle_cry", "second_wind" ]
+    },
+    {
+      "id": "rogue",
+      "name": "Rogue",
+      "description": "A swift and deadly duelist. High Attack but fragile — strike fast before you're struck.",
+      "baseStats": { "health": 80, "attack": 22, "defense": 8, "magic": 8 },
+      "levelUpOptions": [
+        { "label": "Assassin",   "stats": { "health":  4, "attack": 20, "defense":  0, "magic":  6 } },
+        { "label": "Shadow",     "stats": { "health":  6, "attack": 12, "defense":  2, "magic": 10 } },
+        { "label": "Scout",      "stats": { "health": 12, "attack": 10, "defense":  8, "magic":  0 } }
+      ],
+      "xpPerWin": 50,
+      "xpToLevelUp": 100,
+      "defaultMoveIds": [ "dirty_kick", "frenzy", "shadow_bolt", "drain_life" ]
+    },
+    {
+      "id": "mage",
+      "name": "Mage",
+      "description": "A powerful caster who bends reality with magic. Devastating but frail. Magic is everything.",
+      "baseStats": { "health": 70, "attack": 5, "defense": 8, "magic": 22 },
+      "levelUpOptions": [
+        { "label": "Archmage",    "stats": { "health":  4, "attack": 0, "defense":  2, "magic": 24 } },
+        { "label": "Scholar",     "stats": { "health": 10, "attack": 0, "defense":  6, "magic": 14 } },
+        { "label": "Elementalist","stats": { "health":  6, "attack": 4, "defense":  0, "magic": 20 } }
+      ],
+      "xpPerWin": 50,
+      "xpToLevelUp": 100,
+      "defaultMoveIds": [ "firebolt", "arcane_surge", "mana_drain", "dark_pact" ]
+    }
+  ],
   "moves": [
     {
       "id": "slash",

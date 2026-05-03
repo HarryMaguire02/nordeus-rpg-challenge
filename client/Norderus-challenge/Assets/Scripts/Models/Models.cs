@@ -46,6 +46,13 @@ public class Stats
 }
 
 [Serializable]
+public class LevelUpOption
+{
+    public string label;
+    public Stats stats;
+}
+
+[Serializable]
 public class MonsterConfig
 {
     public string id;
@@ -57,12 +64,29 @@ public class MonsterConfig
 [Serializable]
 public class HeroConfig
 {
+    public string id;
     public string name;
+    public string description;
     public Stats baseStats;
-    public Stats statIncreasePerLevel;
+    public List<LevelUpOption> levelUpOptions;
     public int xpPerWin;
     public int xpToLevelUp;
     public List<Move> defaultMoves;
+}
+
+[Serializable]
+public class HeroSummary
+{
+    public string id;
+    public string name;
+    public string description;
+    public Stats baseStats;
+}
+
+[Serializable]
+public class HeroListResponse
+{
+    public List<HeroSummary> heroes;
 }
 
 [Serializable]
@@ -70,6 +94,19 @@ public class RunConfig
 {
     public HeroConfig hero;
     public List<MonsterConfig> monsters;
+}
+
+// Persisted to PlayerPrefs when the player saves mid-run
+[Serializable]
+public class SaveData
+{
+    public string heroId;
+    public int heroLevel;
+    public int heroXp;
+    public int monstersDefeated;
+    public List<Stats> chosenLevelUpBoosts;
+    public List<string> equippedMoveIds;
+    public List<string> learnedMoveIds;
 }
 
 // Sent from Unity to backend each turn

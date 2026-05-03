@@ -21,14 +21,34 @@ public class ApiService : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    public void GetRunConfig(Action<RunConfig> onSuccess, Action<string> onError)
+    public void GetHeroes(Action<HeroListResponse> onSuccess, Action<string> onError)
     {
-        StartCoroutine(GetRunConfigCoroutine(onSuccess, onError));
+        StartCoroutine(GetHeroesCoroutine(onSuccess, onError));
     }
 
-    private IEnumerator GetRunConfigCoroutine(Action<RunConfig> onSuccess, Action<string> onError)
+    private IEnumerator GetHeroesCoroutine(Action<HeroListResponse> onSuccess, Action<string> onError)
     {
-        using var request = UnityWebRequest.Get($"{BaseUrl}/api/run-config");
+        using var request = UnityWebRequest.Get($"{BaseUrl}/api/heroes");
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            onError?.Invoke(request.error);
+            yield break;
+        }
+
+        var response = JsonUtility.FromJson<HeroListResponse>(request.downloadHandler.text);
+        onSuccess?.Invoke(response);
+    }
+
+    public void GetRunConfig(string heroId, Action<RunConfig> onSuccess, Action<string> onError)
+    {
+        StartCoroutine(GetRunConfigCoroutine(heroId, onSuccess, onError));
+    }
+
+    private IEnumerator GetRunConfigCoroutine(string heroId, Action<RunConfig> onSuccess, Action<string> onError)
+    {
+        using var request = UnityWebRequest.Get($"{BaseUrl}/api/run-config/{heroId}");
         yield return request.SendWebRequest();
 
         if (request.result != UnityWebRequest.Result.Success)

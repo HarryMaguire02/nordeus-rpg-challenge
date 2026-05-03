@@ -4,6 +4,7 @@ namespace NordeusChallenge.Api.Services;
 
 public interface IGameDataService
 {
-    RunConfigDto GetRunConfig();
+    HeroListDto GetHeroes();
+    RunConfigDto? GetRunConfig(string heroId);
     MoveDto? GetMonsterMove(BattleStateDto state);
 }

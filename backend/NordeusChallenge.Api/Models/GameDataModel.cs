@@ -1,3 +1,3 @@
 namespace NordeusChallenge.Api.Models;
 
-public record GameDataModel(HeroModel Hero, List<Move> Moves, List<MonsterModel> Monsters);
+public record GameDataModel(List<HeroModel> Heroes, List<Move> Moves, List<MonsterModel> Monsters);

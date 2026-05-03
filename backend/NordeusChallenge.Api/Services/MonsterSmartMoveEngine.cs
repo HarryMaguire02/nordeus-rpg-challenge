@@ -3,9 +3,9 @@ using NordeusChallenge.Api.Models;
 
 namespace NordeusChallenge.Api.Services;
 
-public static class MonsterSmartMoveEngine
+public class MonsterSmartMoveEngine : IMonsterMoveEngine
 {
-    public static MoveDto PickMove(MonsterConfigDto monster, BattleStateDto state)
+    public MoveDto PickMove(MonsterConfigDto monster, BattleStateDto state)
     {
         var moves = monster.Moves;
 
@@ -28,16 +28,14 @@ public static class MonsterSmartMoveEngine
         {
             var killMoves = heavyDamageMoves.Count > 0 ? heavyDamageMoves : damageMoves;
             if (killMoves.Count > 0 && Random.Shared.NextDouble() < 0.85)
-            {
-                return killMoves[Random.Shared.Next(killMoves.Count)];
-            }
+                return PickRandom(killMoves);
         }
 
         // 2. Monster near death → survive
         if (state.MonsterCurrentHp < state.MonsterMaxHp * 0.25
             && sustainMoves.Count > 0 && Random.Shared.NextDouble() < 0.75)
         {
-            return sustainMoves[Random.Shared.Next(sustainMoves.Count)];
+            return PickRandom(sustainMoves);
         }
 
         // 3. Monster has an offensive buff active → capitalize with heavy damage
@@ -47,27 +45,28 @@ public static class MonsterSmartMoveEngine
         {
             var capMoves = heavyDamageMoves.Count > 0 ? heavyDamageMoves : damageMoves;
             if (capMoves.Count > 0)
-            {
-                return capMoves[Random.Shared.Next(capMoves.Count)];
-            }
+                return PickRandom(capMoves);
         }
 
         // 4. Hero is threatening → debuff or build defense
         if (state.HeroEffectiveAttack > state.MonsterEffectiveDefense * 1.5
             && debuffOrDefMoves.Count > 0 && Random.Shared.NextDouble() < 0.65)
         {
-            return debuffOrDefMoves[Random.Shared.Next(debuffOrDefMoves.Count)];
+            return PickRandom(debuffOrDefMoves);
         }
 
         // 5. Fallback low-HP sustain bias
         if (state.MonsterCurrentHp < state.MonsterMaxHp * 0.30
             && sustainMoves.Count > 0 && Random.Shared.NextDouble() < 0.55)
         {
-            return sustainMoves[Random.Shared.Next(sustainMoves.Count)];
+            return PickRandom(sustainMoves);
         }
 
-        return moves[Random.Shared.Next(moves.Count)];
+        return PickRandom(moves);
     }
+
+    private static MoveDto PickRandom(List<MoveDto> moves) =>
+        moves[Random.Shared.Next(moves.Count)];
 
     private static bool HasEffect(MoveDto move, params EffectKind[] kinds)
     {
