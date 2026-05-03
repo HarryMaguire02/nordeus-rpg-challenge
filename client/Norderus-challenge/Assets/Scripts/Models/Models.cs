@@ -23,6 +23,10 @@ public class MoveEffect
     public EffectKind kind;
     public int baseValue;
     public int duration;
+
+    // JsonUtility can't deserialize null for [Serializable] classes — it creates a default
+    // instance (kind=Damage, baseValue=0). A real effect always has a non-zero baseValue.
+    public bool IsValid => baseValue != 0;
 }
 
 [Serializable]

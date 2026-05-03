@@ -37,7 +37,7 @@ public class GameDataService : IGameDataService
         if (hero is null) return null;
 
         var movesById = BuildMovesById(data);
-        var monsters  = BuildMonsterDtos(data, movesById);
+        var monsters = BuildMonsterDtos(data, movesById);
 
         var heroDto = new HeroConfigDto(
             hero.Id,
@@ -59,7 +59,7 @@ public class GameDataService : IGameDataService
         var monster = data.Monsters.FirstOrDefault(m => m.Id == state.MonsterId);
         if (monster is null) return null;
 
-        var movesById  = BuildMovesById(data);
+        var movesById = BuildMovesById(data);
         var monsterDto = BuildMonsterDto(monster, movesById);
 
         return _moveEngine.PickMove(monsterDto, state);

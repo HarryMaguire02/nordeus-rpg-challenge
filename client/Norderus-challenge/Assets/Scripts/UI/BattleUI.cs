@@ -15,9 +15,15 @@ public class BattleUI : MonoBehaviour
     [SerializeField] private Slider heroHpBar;
     [SerializeField] private TextMeshProUGUI heroHpText;
 
+    [Header("Modifiers")]
+    [SerializeField] private GameObject heroModifiersPanel;
+    [SerializeField] private GameObject monsterModifiersPanel;
+
     [Header("Moves")]
     [SerializeField] private Button[] moveButtons;
     [SerializeField] private TextMeshProUGUI[] moveButtonTexts;
+    [SerializeField] private Image[] moveButtonIcons;    // length 4, one per button
+    [SerializeField] private Sprite[] moveEffectSprites; // length 5: PhysicalDmg, MagicDmg, Heal, Buff, Debuff
 
     [Header("Feedback")]
     [SerializeField] private TextMeshProUGUI feedbackText;
@@ -53,7 +59,13 @@ public class BattleUI : MonoBehaviour
         winPanel.SetActive(false);
         lossPanel.SetActive(false);
         feedbackText.text = string.Empty;
-        if (moveTooltipPanel != null) moveTooltipPanel.SetActive(false);
+        if (moveTooltipPanel != null)
+        {
+            moveTooltipPanel.SetActive(false);
+            var tooltipImage = moveTooltipPanel.GetComponent<Image>();
+            if (tooltipImage != null) tooltipImage.raycastTarget = false;
+        }
+        if (moveTooltipText != null) moveTooltipText.raycastTarget = false;
         ClearBattleLog();
         SetupSprites();
 
@@ -96,6 +108,8 @@ public class BattleUI : MonoBehaviour
         monsterHpBar.value    = monster.CurrentHp;
         monsterHpText.text    = $"{monster.CurrentHp} / {monster.MaxHp}";
         monsterNameText.text  = monster.Name;
+
+        RefreshAllModifiers();
     }
 
     private void OnMoveExecuted(string message)
@@ -119,6 +133,7 @@ public class BattleUI : MonoBehaviour
                 moveButtons[i].gameObject.SetActive(true);
                 moveButtons[i].interactable = true;
                 moveButtonTexts[i].text = capturedMove.name;
+                UpdateMoveIcon(i, capturedMove);
                 moveButtons[i].onClick.RemoveAllListeners();
                 moveButtons[i].onClick.AddListener(() => BattleManager.Instance.PlayerSelectMove(capturedMove));
                 AddMoveTooltip(moveButtons[i], capturedMove);
@@ -217,6 +232,8 @@ public class BattleUI : MonoBehaviour
         moveTooltipPanel.SetActive(true);
 
         var tooltipRect = moveTooltipPanel.GetComponent<RectTransform>();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(tooltipRect);
+
         var cam = _canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _canvas.worldCamera;
         var canvasRect = _canvas.GetComponent<RectTransform>();
         Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(cam, buttonRect.position);
@@ -226,6 +243,104 @@ public class BattleUI : MonoBehaviour
         string typeLabel = move.type == MoveType.Physical ? "Physical" : "Magic";
         string desc = string.IsNullOrEmpty(move.description) ? "" : move.description;
         moveTooltipText.text = $"<b>{move.name}</b>  [{typeLabel}]\n{desc}";
+    }
+
+    // ── Modifiers display ────────────────────────────────────────────────────
+
+    private string ModifierLabel(BattleManager.StatModifier mod)
+    {
+        string stat = mod.Kind switch
+        {
+            EffectKind.BuffSelfAttack    or EffectKind.DebuffTargetAttack  => "ATK",
+            EffectKind.BuffSelfDefense   or EffectKind.DebuffTargetDefense => "DEF",
+            EffectKind.BuffSelfMagic     or EffectKind.DebuffTargetMagic   => "MAG",
+            _ => null
+        };
+        if (stat == null) return null;
+        bool isBuff = mod.Kind == EffectKind.BuffSelfAttack
+                   || mod.Kind == EffectKind.BuffSelfDefense
+                   || mod.Kind == EffectKind.BuffSelfMagic;
+        string sign = isBuff ? "+" : "-";
+        return $"{stat} {sign}{mod.Value} ({mod.TurnsRemaining})";
+    }
+
+    private Color ModifierColor(BattleManager.StatModifier mod)
+    {
+        bool isBuff = mod.Kind == EffectKind.BuffSelfAttack
+                   || mod.Kind == EffectKind.BuffSelfDefense
+                   || mod.Kind == EffectKind.BuffSelfMagic;
+        return isBuff ? new Color(0.20f, 0.70f, 0.20f) : new Color(0.75f, 0.15f, 0.15f);
+    }
+
+    private void RefreshModifiersPanel(GameObject panel, System.Collections.Generic.List<BattleManager.StatModifier> mods)
+    {
+        if (panel == null) return;
+        foreach (Transform child in panel.transform) Destroy(child.gameObject);
+
+        foreach (var mod in mods)
+        {
+            string label = ModifierLabel(mod);
+            if (label == null) continue;
+
+            var chip = new GameObject("Chip");
+            chip.transform.SetParent(panel.transform, false);
+
+            var img   = chip.AddComponent<Image>();
+            img.color = ModifierColor(mod);
+
+            var csf = chip.AddComponent<ContentSizeFitter>();
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            csf.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+
+            var hLayout = chip.AddComponent<HorizontalLayoutGroup>();
+            hLayout.padding                = new RectOffset(5, 5, 2, 2);
+            hLayout.childForceExpandWidth  = false;
+            hLayout.childForceExpandHeight = false;
+
+            var textGo = new GameObject("Label");
+            textGo.transform.SetParent(chip.transform, false);
+            var tmp       = textGo.AddComponent<TextMeshProUGUI>();
+            tmp.text      = label;
+            tmp.fontSize  = 11;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.color     = Color.white;
+        }
+    }
+
+    private void RefreshAllModifiers()
+    {
+        RefreshModifiersPanel(heroModifiersPanel,    BattleManager.Instance.Hero.Modifiers);
+        RefreshModifiersPanel(monsterModifiersPanel, BattleManager.Instance.Monster.Modifiers);
+    }
+
+    // ── Move icons ───────────────────────────────────────────────────────────
+
+    private Sprite GetMoveSprite(Move move)
+    {
+        if (moveEffectSprites == null || moveEffectSprites.Length < 5) return null;
+        switch (move.primary.kind)
+        {
+            case EffectKind.Heal:                  return moveEffectSprites[2];
+            case EffectKind.BuffSelfAttack:
+            case EffectKind.BuffSelfDefense:
+            case EffectKind.BuffSelfMagic:         return moveEffectSprites[3];
+            case EffectKind.DebuffTargetAttack:
+            case EffectKind.DebuffTargetDefense:
+            case EffectKind.DebuffTargetMagic:     return moveEffectSprites[4];
+            case EffectKind.Damage:
+                return move.type == MoveType.Magic ? moveEffectSprites[1] : moveEffectSprites[0];
+            default: return null;
+        }
+    }
+
+    private void UpdateMoveIcon(int index, Move move)
+    {
+        if (moveButtonIcons == null || index >= moveButtonIcons.Length) return;
+        var icon = moveButtonIcons[index];
+        if (icon == null) return;
+        var sp = GetMoveSprite(move);
+        icon.sprite  = sp;
+        icon.enabled = sp != null;
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────

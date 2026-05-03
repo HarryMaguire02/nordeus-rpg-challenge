@@ -4,7 +4,7 @@
       "id": "knight",
       "name": "Knight",
       "description": "A stalwart warrior clad in heavy armor. Balanced stats make him adaptable on the battlefield.",
-      "baseStats": { "health": 100, "attack": 15, "defense": 10, "magic": 10 },
+      "baseStats": { "health": 85, "attack": 15, "defense": 10, "magic": 10 },
       "levelUpOptions": [
         { "label": "Warrior", "stats": { "health": 10, "attack": 14, "defense": 6, "magic": 0 } },
         { "label": "Tank",    "stats": { "health": 18, "attack":  2, "defense": 10, "magic": 0 } },
@@ -18,7 +18,7 @@
       "id": "rogue",
       "name": "Rogue",
       "description": "A swift and deadly duelist. High Attack but fragile — strike fast before you're struck.",
-      "baseStats": { "health": 80, "attack": 22, "defense": 8, "magic": 8 },
+      "baseStats": { "health": 68, "attack": 22, "defense": 8, "magic": 8 },
       "levelUpOptions": [
         { "label": "Assassin",   "stats": { "health":  4, "attack": 20, "defense":  0, "magic":  6 } },
         { "label": "Shadow",     "stats": { "health":  6, "attack": 12, "defense":  2, "magic": 10 } },
@@ -32,7 +32,7 @@
       "id": "mage",
       "name": "Mage",
       "description": "A powerful caster who bends reality with magic. Devastating but frail. Magic is everything.",
-      "baseStats": { "health": 70, "attack": 5, "defense": 8, "magic": 22 },
+      "baseStats": { "health": 60, "attack": 5, "defense": 8, "magic": 22 },
       "levelUpOptions": [
         { "label": "Archmage",    "stats": { "health":  4, "attack": 0, "defense":  2, "magic": 24 } },
         { "label": "Scholar",     "stats": { "health": 10, "attack": 0, "defense":  6, "magic": 14 } },
@@ -241,31 +241,31 @@
     {
       "id": "goblin_warrior",
       "name": "Goblin Warrior",
-      "stats": { "health": 60, "attack": 16, "defense": 5, "magic": 3 },
+      "stats": { "health": 72, "attack": 20, "defense": 6, "magic": 3 },
       "moveIds": [ "rusty_blade", "dirty_kick", "frenzy", "headbutt" ]
     },
     {
       "id": "giant_spider",
       "name": "Giant Spider",
-      "stats": { "health": 75, "attack": 18, "defense": 8, "magic": 3 },
+      "stats": { "health": 98, "attack": 24, "defense": 10, "magic": 4 },
       "moveIds": [ "bite", "web_throw", "pounce", "skitter" ]
     },
     {
       "id": "goblin_mage",
       "name": "Goblin Mage",
-      "stats": { "health": 65, "attack": 5, "defense": 5, "magic": 15 },
+      "stats": { "health": 90, "attack": 6, "defense": 7, "magic": 22 },
       "moveIds": [ "firebolt", "arcane_surge", "mana_drain", "hex_shield" ]
     },
     {
       "id": "witch",
       "name": "Witch",
-      "stats": { "health": 70, "attack": 5, "defense": 8, "magic": 18 },
+      "stats": { "health": 115, "attack": 7, "defense": 11, "magic": 28 },
       "moveIds": [ "shadow_bolt", "drain_life", "curse", "dark_pact" ]
     },
     {
       "id": "dragon",
       "name": "Dragon",
-      "stats": { "health": 120, "attack": 24, "defense": 15, "magic": 20 },
+      "stats": { "health": 200, "attack": 40, "defense": 18, "magic": 32 },
       "moveIds": [ "flame_breath", "claw_swipe", "intimidate", "dragon_scales" ]
     }
   ]

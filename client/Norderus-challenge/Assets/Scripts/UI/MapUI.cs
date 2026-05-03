@@ -8,6 +8,11 @@ public class MapUI : MonoBehaviour
     [SerializeField] private Button[] encounterButtons;
     [SerializeField] private TextMeshProUGUI[] encounterButtonTexts;
 
+    [Header("Hero Identity")]
+    [SerializeField] private Image heroPortraitImage;
+    [SerializeField] private TextMeshProUGUI heroNameText;
+    [SerializeField] private Sprite[] heroSprites; // Inspector: index 0=knight, 1=rogue, 2=mage
+
     [Header("Hero Stats")]
     [SerializeField] private TextMeshProUGUI heroLevelText;
     [SerializeField] private TextMeshProUGUI heroXpText;
@@ -46,6 +51,7 @@ public class MapUI : MonoBehaviour
 
     private void RefreshAll()
     {
+        RefreshHeroIdentity();
         RefreshEncounters();
         RefreshHeroStats();
         RefreshEquippedMoves();
@@ -53,6 +59,8 @@ public class MapUI : MonoBehaviour
     }
 
     // ── Encounters ───────────────────────────────────────────────────────────
+
+    private static readonly string[] HeroOrder = { "knight", "rogue", "mage" };
 
     private static readonly Color ColorDefeated = new Color(0.20f, 0.70f, 0.20f, 1f);
     private static readonly Color ColorCurrent  = new Color(0.55f, 0.10f, 0.10f, 1f);
@@ -95,6 +103,23 @@ public class MapUI : MonoBehaviour
         var cb = btn.colors;
         cb.normalColor = normal;
         btn.colors = cb;
+    }
+
+    // ── Hero identity ────────────────────────────────────────────────────────
+
+    private void RefreshHeroIdentity()
+    {
+        if (heroNameText != null)
+        {
+            heroNameText.text  = GameManager.Instance.RunConfig.hero.name;
+            heroNameText.color = new Color(1f, 0.84f, 0f);
+        }
+        if (heroPortraitImage != null && heroSprites != null)
+        {
+            int idx = System.Array.IndexOf(HeroOrder, GameManager.Instance.SelectedHeroId);
+            if (idx >= 0 && idx < heroSprites.Length)
+                heroPortraitImage.sprite = heroSprites[idx];
+        }
     }
 
     // ── Hero stats ───────────────────────────────────────────────────────────

@@ -26,9 +26,9 @@ public class BattleManager : MonoBehaviour
         public List<Move> Moves;
         public readonly List<StatModifier> Modifiers = new();
 
-        public int EffectiveAttack  => Mathf.Max(1, BaseStats.attack  + ModSum(EffectKind.BuffSelfAttack,   EffectKind.DebuffTargetAttack));
+        public int EffectiveAttack => Mathf.Max(1, BaseStats.attack + ModSum(EffectKind.BuffSelfAttack,   EffectKind.DebuffTargetAttack));
         public int EffectiveDefense => Mathf.Max(0, BaseStats.defense + ModSum(EffectKind.BuffSelfDefense,  EffectKind.DebuffTargetDefense));
-        public int EffectiveMagic   => Mathf.Max(1, BaseStats.magic   + ModSum(EffectKind.BuffSelfMagic,    EffectKind.DebuffTargetMagic));
+        public int EffectiveMagic => Mathf.Max(1, BaseStats.magic + ModSum(EffectKind.BuffSelfMagic,    EffectKind.DebuffTargetMagic));
 
         private int ModSum(EffectKind buff, EffectKind debuff) =>
             Modifiers.Where(m => m.Kind == buff).Sum(m => m.Value) -
@@ -44,13 +44,13 @@ public class BattleManager : MonoBehaviour
     public event Action OnMonsterTurnStart;
     public event Action<string> OnMoveExecuted;
     public event Action OnStatsUpdated;
-    public event Action<bool> OnBattleEnd; // true = hero won
+    public event Action<bool> OnBattleEnd;
 
     // ── State ────────────────────────────────────────────────────────────────
 
-    public BattleCharacter Hero    { get; private set; }
+    public BattleCharacter Hero { get; private set; }
     public BattleCharacter Monster { get; private set; }
-    public int TurnNumber          { get; private set; }
+    public int TurnNumber { get; private set; }
 
     private MonsterConfig _monsterConfig;
     private bool _battleOver;
@@ -68,25 +68,25 @@ public class BattleManager : MonoBehaviour
     public void StartBattle(MonsterConfig monster, Stats heroStats, List<Move> heroMoves)
     {
         _monsterConfig = monster;
-        _battleOver    = false;
-        TurnNumber     = 0;
+        _battleOver = false;
+        TurnNumber = 0;
 
         Hero = new BattleCharacter
         {
-            Name      = "Knight",
-            MaxHp     = heroStats.health,
+            Name = "Knight",
+            MaxHp = heroStats.health,
             CurrentHp = heroStats.health,
             BaseStats = heroStats,
-            Moves     = heroMoves
+            Moves = heroMoves
         };
 
         Monster = new BattleCharacter
         {
-            Name      = monster.name,
-            MaxHp     = monster.stats.health,
+            Name = monster.name,
+            MaxHp = monster.stats.health,
             CurrentHp = monster.stats.health,
             BaseStats = monster.stats,
-            Moves     = monster.moves
+            Moves = monster.moves
         };
 
         OnStatsUpdated?.Invoke();
@@ -145,7 +145,7 @@ public class BattleManager : MonoBehaviour
     private void ApplyMove(Move move, BattleCharacter attacker, BattleCharacter defender)
     {
         ApplyEffect(move.primary, move.type, attacker, defender);
-        if (move.secondary != null)
+        if (move.secondary != null && move.secondary.IsValid)
             ApplyEffect(move.secondary, move.type, attacker, defender);
     }
 
@@ -188,23 +188,23 @@ public class BattleManager : MonoBehaviour
     private bool CheckBattleEnd()
     {
         if (Monster.CurrentHp <= 0) { _battleOver = true; OnBattleEnd?.Invoke(true);  return true; }
-        if (Hero.CurrentHp    <= 0) { _battleOver = true; OnBattleEnd?.Invoke(false); return true; }
+        if (Hero.CurrentHp <= 0) { _battleOver = true; OnBattleEnd?.Invoke(false); return true; }
         return false;
     }
 
     private BattleStateRequest BuildBattleState() => new()
     {
-        monsterId               = _monsterConfig.id,
-        monsterCurrentHp        = Monster.CurrentHp,
-        monsterMaxHp            = Monster.MaxHp,
-        monsterEffectiveAttack  = Monster.EffectiveAttack,
+        monsterId = _monsterConfig.id,
+        monsterCurrentHp = Monster.CurrentHp,
+        monsterMaxHp = Monster.MaxHp,
+        monsterEffectiveAttack = Monster.EffectiveAttack,
         monsterEffectiveDefense = Monster.EffectiveDefense,
-        monsterEffectiveMagic   = Monster.EffectiveMagic,
-        heroCurrentHp           = Hero.CurrentHp,
-        heroMaxHp               = Hero.MaxHp,
-        heroEffectiveAttack     = Hero.EffectiveAttack,
-        heroEffectiveDefense    = Hero.EffectiveDefense,
-        heroEffectiveMagic      = Hero.EffectiveMagic,
-        turnNumber              = TurnNumber
+        monsterEffectiveMagic = Monster.EffectiveMagic,
+        heroCurrentHp = Hero.CurrentHp,
+        heroMaxHp = Hero.MaxHp,
+        heroEffectiveAttack = Hero.EffectiveAttack,
+        heroEffectiveDefense = Hero.EffectiveDefense,
+        heroEffectiveMagic = Hero.EffectiveMagic,
+        turnNumber = TurnNumber
     };
 }

@@ -40,7 +40,7 @@ public class MonsterSmartMoveEngine : IMonsterMoveEngine
 
         // 3. Monster has an offensive buff active → capitalize with heavy damage
         bool attackBuffed = state.MonsterEffectiveAttack > monster.Stats.Attack;
-        bool magicBuffed  = state.MonsterEffectiveMagic  > monster.Stats.Magic;
+        bool magicBuffed = state.MonsterEffectiveMagic  > monster.Stats.Magic;
         if ((attackBuffed || magicBuffed) && Random.Shared.NextDouble() < 0.80)
         {
             var capMoves = heavyDamageMoves.Count > 0 ? heavyDamageMoves : damageMoves;
