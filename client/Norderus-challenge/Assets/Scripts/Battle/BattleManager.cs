@@ -115,10 +115,10 @@ public class BattleManager : MonoBehaviour
 
         bool waiting = true;
         ApiService.Instance.GetMonsterMove(BuildBattleState(),
-            response =>
+            move =>
             {
-                ApplyMove(response.move, Monster, Hero);
-                OnMoveExecuted?.Invoke($"{Monster.Name} used {response.move.name}!");
+                ApplyMove(move, Monster, Hero);
+                OnMoveExecuted?.Invoke($"{Monster.Name} used {move.name}!");
                 OnStatsUpdated?.Invoke();
                 waiting = false;
             },

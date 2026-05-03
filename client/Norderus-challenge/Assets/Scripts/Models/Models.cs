@@ -90,9 +90,3 @@ public class BattleStateRequest
     public int turnNumber;
 }
 
-// Received from backend — the move the monster will play
-[Serializable]
-public class MonsterMoveResponse
-{
-    public Move move;
-}

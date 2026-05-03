@@ -41,12 +41,12 @@ public class ApiService : MonoBehaviour
         onSuccess?.Invoke(config);
     }
 
-    public void GetMonsterMove(BattleStateRequest battleState, Action<MonsterMoveResponse> onSuccess, Action<string> onError)
+    public void GetMonsterMove(BattleStateRequest battleState, Action<Move> onSuccess, Action<string> onError)
     {
         StartCoroutine(GetMonsterMoveCoroutine(battleState, onSuccess, onError));
     }
 
-    private IEnumerator GetMonsterMoveCoroutine(BattleStateRequest battleState, Action<MonsterMoveResponse> onSuccess, Action<string> onError)
+    private IEnumerator GetMonsterMoveCoroutine(BattleStateRequest battleState, Action<Move> onSuccess, Action<string> onError)
     {
         var json = JsonUtility.ToJson(battleState);
         using var request = new UnityWebRequest($"{BaseUrl}/api/monster-move", "POST");
@@ -62,7 +62,7 @@ public class ApiService : MonoBehaviour
             yield break;
         }
 
-        var response = JsonUtility.FromJson<MonsterMoveResponse>(request.downloadHandler.text);
-        onSuccess?.Invoke(response);
+        var move = JsonUtility.FromJson<Move>(request.downloadHandler.text);
+        onSuccess?.Invoke(move);
     }
 }

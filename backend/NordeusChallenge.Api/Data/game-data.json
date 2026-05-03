@@ -1,0 +1,236 @@
+{
+  "hero": {
+    "name": "Knight",
+    "baseStats": { "health": 100, "attack": 15, "defense": 10, "magic": 10 },
+    "statIncreasePerLevel": { "health": 15, "attack": 5, "defense": 5, "magic": 5 },
+    "xpPerWin": 50,
+    "xpToLevelUp": 100,
+    "defaultMoveIds": [ "slash", "shield_up", "battle_cry", "second_wind" ]
+  },
+  "moves": [
+    {
+      "id": "slash",
+      "name": "Slash",
+      "type": "Physical",
+      "description": "Strike with your sword, dealing moderate physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 5, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "shield_up",
+      "name": "Shield Up",
+      "type": "Physical",
+      "description": "Raise your shield, boosting Defense for 2 turns.",
+      "primary": { "kind": "BuffSelfDefense", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "battle_cry",
+      "name": "Battle Cry",
+      "type": "Physical",
+      "description": "Bellow a war cry, boosting Attack for 2 turns.",
+      "primary": { "kind": "BuffSelfAttack", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "second_wind",
+      "name": "Second Wind",
+      "type": "Magic",
+      "description": "Draw on inner reserves, restoring HP based on Magic stat.",
+      "primary": { "kind": "Heal", "baseValue": 8, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "shadow_bolt",
+      "name": "Shadow Bolt",
+      "type": "Magic",
+      "description": "Hurl a bolt of dark energy dealing heavy magic damage.",
+      "primary": { "kind": "Damage", "baseValue": 12, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "drain_life",
+      "name": "Drain Life",
+      "type": "Magic",
+      "description": "Leech the target's life force, dealing damage and healing self.",
+      "primary": { "kind": "Damage", "baseValue": 2, "duration": 0 },
+      "secondary": { "kind": "Heal", "baseValue": 2, "duration": 0 }
+    },
+    {
+      "id": "curse",
+      "name": "Curse",
+      "type": "Magic",
+      "description": "Afflict the target with a curse, reducing their Attack for 2 turns.",
+      "primary": { "kind": "DebuffTargetAttack", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "dark_pact",
+      "name": "Dark Pact",
+      "type": "Magic",
+      "description": "Sacrifice 15 HP to greatly empower Magic for 2 turns.",
+      "primary": { "kind": "BuffSelfMagic", "baseValue": 8, "duration": 2 },
+      "secondary": { "kind": "SelfDamage", "baseValue": 15, "duration": 0 }
+    },
+    {
+      "id": "bite",
+      "name": "Bite",
+      "type": "Physical",
+      "description": "Sink venomous fangs in for moderate physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 5, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "web_throw",
+      "name": "Web Throw",
+      "type": "Physical",
+      "description": "Hurl sticky webbing, dealing light damage and reducing target Defense for 2 turns.",
+      "primary": { "kind": "Damage", "baseValue": 2, "duration": 0 },
+      "secondary": { "kind": "DebuffTargetDefense", "baseValue": 5, "duration": 2 }
+    },
+    {
+      "id": "pounce",
+      "name": "Pounce",
+      "type": "Physical",
+      "description": "Leap onto the target, dealing heavy physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 12, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "skitter",
+      "name": "Skitter",
+      "type": "Physical",
+      "description": "Dodge and weave erratically, boosting own Defense for 2 turns.",
+      "primary": { "kind": "BuffSelfDefense", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "flame_breath",
+      "name": "Flame Breath",
+      "type": "Magic",
+      "description": "Exhale a torrent of fire dealing heavy magic damage.",
+      "primary": { "kind": "Damage", "baseValue": 12, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "claw_swipe",
+      "name": "Claw Swipe",
+      "type": "Physical",
+      "description": "Rake with massive claws for moderate physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 5, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "intimidate",
+      "name": "Intimidate",
+      "type": "Physical",
+      "description": "Roar ferociously, lowering target Attack for 2 turns.",
+      "primary": { "kind": "DebuffTargetAttack", "baseValue": 8, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "dragon_scales",
+      "name": "Dragon Scales",
+      "type": "Physical",
+      "description": "Harden scales to greatly boost Defense for 2 turns.",
+      "primary": { "kind": "BuffSelfDefense", "baseValue": 10, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "rusty_blade",
+      "name": "Rusty Blade",
+      "type": "Physical",
+      "description": "Hack with a corroded blade for moderate physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 5, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "dirty_kick",
+      "name": "Dirty Kick",
+      "type": "Physical",
+      "description": "A cheap shin kick dealing light damage and reducing target Defense for 2 turns.",
+      "primary": { "kind": "Damage", "baseValue": 2, "duration": 0 },
+      "secondary": { "kind": "DebuffTargetDefense", "baseValue": 5, "duration": 2 }
+    },
+    {
+      "id": "frenzy",
+      "name": "Frenzy",
+      "type": "Physical",
+      "description": "Work into a combat frenzy, boosting own Attack for 2 turns.",
+      "primary": { "kind": "BuffSelfAttack", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "headbutt",
+      "name": "Headbutt",
+      "type": "Physical",
+      "description": "A reckless headbutt delivering heavy physical damage.",
+      "primary": { "kind": "Damage", "baseValue": 12, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "firebolt",
+      "name": "Firebolt",
+      "type": "Magic",
+      "description": "Launch a small fireball dealing moderate magic damage.",
+      "primary": { "kind": "Damage", "baseValue": 5, "duration": 0 },
+      "secondary": null
+    },
+    {
+      "id": "arcane_surge",
+      "name": "Arcane Surge",
+      "type": "Magic",
+      "description": "Channel raw arcane power, boosting own Magic for 2 turns.",
+      "primary": { "kind": "BuffSelfMagic", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    },
+    {
+      "id": "mana_drain",
+      "name": "Mana Drain",
+      "type": "Magic",
+      "description": "Siphon magical energy, dealing light damage and reducing target Magic for 2 turns.",
+      "primary": { "kind": "Damage", "baseValue": 2, "duration": 0 },
+      "secondary": { "kind": "DebuffTargetMagic", "baseValue": 6, "duration": 2 }
+    },
+    {
+      "id": "hex_shield",
+      "name": "Hex Shield",
+      "type": "Magic",
+      "description": "Weave a magical barrier, boosting own Defense for 2 turns.",
+      "primary": { "kind": "BuffSelfDefense", "baseValue": 6, "duration": 2 },
+      "secondary": null
+    }
+  ],
+  "monsters": [
+    {
+      "id": "goblin_warrior",
+      "name": "Goblin Warrior",
+      "stats": { "health": 60, "attack": 16, "defense": 5, "magic": 3 },
+      "moveIds": [ "rusty_blade", "dirty_kick", "frenzy", "headbutt" ]
+    },
+    {
+      "id": "giant_spider",
+      "name": "Giant Spider",
+      "stats": { "health": 75, "attack": 18, "defense": 8, "magic": 3 },
+      "moveIds": [ "bite", "web_throw", "pounce", "skitter" ]
+    },
+    {
+      "id": "goblin_mage",
+      "name": "Goblin Mage",
+      "stats": { "health": 65, "attack": 5, "defense": 5, "magic": 15 },
+      "moveIds": [ "firebolt", "arcane_surge", "mana_drain", "hex_shield" ]
+    },
+    {
+      "id": "witch",
+      "name": "Witch",
+      "stats": { "health": 70, "attack": 5, "defense": 8, "magic": 18 },
+      "moveIds": [ "shadow_bolt", "drain_life", "curse", "dark_pact" ]
+    },
+    {
+      "id": "dragon",
+      "name": "Dragon",
+      "stats": { "health": 120, "attack": 24, "defense": 15, "magic": 20 },
+      "moveIds": [ "flame_breath", "claw_swipe", "intimidate", "dragon_scales" ]
+    }
+  ]
+}
